@@ -1,4 +1,6 @@
 import csv
+import click
+
 from decimal import Decimal
 from collections import defaultdict
 from pathlib import Path
@@ -12,8 +14,10 @@ field_names = ["date", "memo", "debit", "credit"]
 IGNORE_LIST = ["MORTGAGE", "TFR-TO C/C", "PAYMENT - THANK YOU"]
 global_months = defaultdict(MonthEntry)
 
-def run():
-    p = Path('/home/tim/Documents/finances')
+@click.command()
+@click.argument("directory")
+def run(directory):
+    p = Path(directory)
     for file in p.iterdir():
         process_file(file)
     print("TOTAL")
