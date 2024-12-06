@@ -39,6 +39,7 @@ def check_match(elem, ignore_list):
             return False
     return True
 
+
 def process_entries(entries, records, ignore_list):
     filtered_entries = filter(lambda elem: check_match(elem, ignore_list), entries)
 
@@ -54,6 +55,7 @@ def process_entries(entries, records, ignore_list):
             print("Error processing entry, skipping: {entry}")
 
     return records
+
 
 if __name__ == "__main__":
     run()

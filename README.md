@@ -1,8 +1,11 @@
 Calculates my monthly income/expenses.
-Put all the files into ~/Documents/finances
-Managed with uv, but it's got no dependencies
+Managed with uv, to run:
+`uv run expenses.py`
 
 TODO
 - Tests
+- Better output format
+- Tagging based on regex. e.g. ".*Grocercs.*" gets the "food" tag
 - (maybe) turn this into a package that can be installed
+- (maybe) charts
 
