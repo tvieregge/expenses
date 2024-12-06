@@ -12,30 +12,26 @@ class MonthEntry(object):
 
 field_names = ["date", "memo", "debit", "credit"]
 IGNORE_LIST = ["MORTGAGE", "TFR-TO C/C", "PAYMENT - THANK YOU"]
-global_months = defaultdict(MonthEntry)
 
 @click.command()
 @click.argument("directory")
 def run(directory):
+    cumulative_records = defaultdict(MonthEntry)
     p = Path(directory)
     for file in p.iterdir():
-        process_file(file)
+        print(file)
+        with open(file, 'r', newline='') as f:
+            reader = csv.DictReader(f, fieldnames=field_names)
+            cumulative_records = process_entries(reader, cumulative_records, IGNORE_LIST)
+
     print("TOTAL")
-    for month,entry in global_months.items():
+    for month,entry in cumulative_records.items():
         print(f"{month}")
         print(f"Debits: {entry.debits}")
         print(f"Credits: {entry.credits}")
         print(f"Surplus: {entry.credits - entry.debits}")
         print("")
 
-def process_file(file):
-    print(file)
-    with open(file, 'r', newline='') as f:
-        reader = csv.DictReader(f, fieldnames=field_names)
-        single_file_months = process_entries(reader, IGNORE_LIST)
-        for month,entry in single_file_months.items():
-            global_months[month].debits += entry.debits
-            global_months[month].credits += entry.credits
 
 def check_match(elem, ignore_list):
     for ignore_text in ignore_list:
@@ -43,22 +39,21 @@ def check_match(elem, ignore_list):
             return False
     return True
 
-def process_entries(entries, ignore_list):
+def process_entries(entries, records, ignore_list):
     filtered_entries = filter(lambda elem: check_match(elem, ignore_list), entries)
-    months = defaultdict(MonthEntry)
 
     for entry in filtered_entries:
         debit = entry["debit"]
         credit = entry["credit"]
         month = entry["date"][0:2]+"-"+entry["date"][-4:]
         if debit:
-            months[month].debits += Decimal(debit)
+            records[month].debits += Decimal(debit)
         elif credit:
-            months[month].credits += Decimal(credit)
+            records[month].credits += Decimal(credit)
         else:
             print("Error processing entry, skipping: {entry}")
 
-    return months
+    return records
 
 if __name__ == "__main__":
     run()
